@@ -1,0 +1,49 @@
+{
+  "name": "docmut",
+  "version": "0.1.0",
+  "description": "AST-based document mutation testing library for LaTeX, Typst, and Markdown",
+  "type": "module",
+  "license": "MIT",
+  "author": "TeXFix-Bench contributors",
+  "keywords": [
+    "mutation-testing",
+    "latex",
+    "typst",
+    "markdown",
+    "document-repair",
+    "benchmark"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "docmut": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "PLANNING.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cli": "tsx src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

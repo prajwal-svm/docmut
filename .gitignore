@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.js
+*.js.map
+*.d.ts
+!jest.config.js
+!vitest.config.ts
+.DS_Store
+*.log
+.env
