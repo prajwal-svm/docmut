@@ -5,7 +5,7 @@
  * 1. AST-based mutations (node-level, not raw text)
  * 2. Deterministic seeded PRNG
  * 3. Render-diff equivalent detection
- * 4. Engine gate (golden compiles, broken fails)
+ * 4. Engine gate (golden compiles; hard broken fails / soft broken warns or differs)
  * 5. Tiered operators (structural / semantic / realistic)
  * 6. Plugin architecture (cosmic-ray pattern)
  */
@@ -15,6 +15,13 @@ export type DocumentFormat = "latex" | "typst" | "markdown";
 
 /** Operator realism tier. */
 export type OperatorTier = 1 | 2 | 3;
+
+/**
+ * Fault track (TeXFix-Bench compatible):
+ * - hard: broken document must FAIL to compile
+ * - soft: broken document still compiles but is faulty (warning or semantic change)
+ */
+export type FaultTrack = "hard" | "soft";
 
 /**
  * Semantic scope of a mutation — enables Stryker-style reports and cohort filters.
@@ -156,6 +163,7 @@ export interface MutationResult {
   operator: string;
   operatorName: string;
   tier: OperatorTier;
+  track: FaultTrack;
   format: DocumentFormat;
   scope: MutationScope;
   seedDocument: string;
@@ -180,6 +188,8 @@ export interface MutationResult {
     goldenPass: boolean | null;
     brokenPass: boolean | null;
     brokenErrors?: string[];
+    brokenWarnings?: string[];
+    reason?: string;
   };
   /** Ground-truth minimal reverse patch (when known). */
   groundTruthPatch?: { remove: string; add: string };
@@ -205,6 +215,13 @@ export interface MutationOperator {
   code: string;
   /** Realism tier: 1 structural, 2 semantic, 3 realistic author error. */
   tier: OperatorTier;
+  /**
+   * Fault track:
+   * - hard → expects compile failure (engine gate: golden✓ broken✗)
+   * - soft → expects compile success with warning/semantic change
+   * Defaults to "hard" when omitted.
+   */
+  track?: FaultTrack;
   /** Document formats this operator applies to. */
   formats: DocumentFormat[];
   /** Semantic scope tag. */
@@ -237,17 +254,35 @@ export interface MutateOptions {
   operators?: string[] | "all";
   /** Variants per (document × operator). Default 5. */
   variants?: number;
-  /** Run engine gate (compile golden + broken). Default false in unit tests. */
-  engineGate?: boolean;
-  /** Run render-diff equivalent detection. Default false unless engineGate. */
+  /**
+   * Run engine gate (compile golden + broken).
+   * - true / "auto": use each operator's track (hard vs soft criteria)
+   * - "hard": only keep hard-track failures (compile fail)
+   * - "soft": only keep soft-track faults (compile + warning/diff)
+   * - false: static differ-only check
+   */
+  engineGate?: boolean | "auto" | "hard" | "soft";
+  /** Run render-diff equivalent detection. Default false. */
   renderDiff?: boolean;
+  /**
+   * When true (default), equivalent mutants are excluded from results.
+   * Set false to keep them with equivalentDetected=true for transparency logs.
+   */
+  excludeEquivalent?: boolean;
   /** Optional document path for provenance. */
   path?: string;
   /** Working directory for multi-file compile (optional). */
   workDir?: string;
   /** Max sites considered per operator (after shuffle). Default unlimited. */
   maxSitesPerOperator?: number;
+  /** Compile timeout per document (ms). Default 60000. */
+  compileTimeoutMs?: number;
 }
 
 /** Default global salt pinned for reproducibility. */
 export const DEFAULT_SALT = 20260802;
+
+/** Resolve operator track with default hard. */
+export function operatorTrack(op: MutationOperator): FaultTrack {
+  return op.track ?? "hard";
+}

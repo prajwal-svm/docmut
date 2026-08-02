@@ -141,15 +141,18 @@ function listOperators(): void {
     "CODE".padEnd(16) +
       "NAME".padEnd(24) +
       "TIER".padEnd(6) +
+      "TRACK".padEnd(6) +
       "FORMAT".padEnd(12) +
       "SCOPE",
   );
-  console.log("-".repeat(80));
+  console.log("-".repeat(90));
   for (const op of ALL_OPERATORS) {
+    const track = op.track ?? "hard";
     console.log(
       op.code.padEnd(16) +
         op.name.padEnd(24) +
         String(op.tier).padEnd(6) +
+        track.padEnd(6) +
         op.formats.join(",").padEnd(12) +
         op.scope,
     );
@@ -170,7 +173,7 @@ function writeBrokenFiles(mutations: MutationResult[], dir: string): void {
     version: 1,
     seed: m.seedDocument,
     category: m.operator,
-    track: m.tier === 1 ? "hard" : m.tier === 2 ? "hard" : "hard",
+    track: m.track,
     categoryLabel: m.operatorName,
     group: m.scope,
     faultLine: m.mutationSite.line,

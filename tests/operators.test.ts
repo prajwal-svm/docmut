@@ -40,6 +40,20 @@ describe("operator catalog", () => {
     expect(md.length).toBe(8);
   });
 
+
+  it("has hard and soft tracks", () => {
+    const hard = ALL_OPERATORS.filter((o) => (o.track ?? "hard") === "hard");
+    const soft = ALL_OPERATORS.filter((o) => o.track === "soft");
+    expect(hard.length + soft.length).toBe(48);
+    expect(soft.length).toBeGreaterThan(0);
+    expect(hard.length).toBeGreaterThan(0);
+    // Soft refs / relations
+    expect(defaultRegistry.get("TEX-REF-UDF")?.track).toBe("soft");
+    expect(defaultRegistry.get("TEX-MTH-REL")?.track).toBe("soft");
+    // Hard braces
+    expect(defaultRegistry.get("TEX-BRC-DRP")?.track ?? "hard").toBe("hard");
+  });
+
   it("tiers sum correctly", () => {
     expect(ALL_OPERATORS.filter((o) => o.tier === 1).length).toBe(19);
     expect(ALL_OPERATORS.filter((o) => o.tier === 2).length).toBe(18);

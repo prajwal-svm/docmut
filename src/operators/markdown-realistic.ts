@@ -11,6 +11,7 @@ import { site } from "../core/mutation-site.js";
 export const imageBroken: MutationOperator = {
   name: "ImageBroken",
   code: "MD-IMG-BRK",
+  track: "soft",
   tier: 3,
   formats: ["markdown"],
   scope: "link",
@@ -57,6 +58,7 @@ export const imageBroken: MutationOperator = {
 export const htmlTagUnclosed: MutationOperator = {
   name: "HTMLTagUnclosed",
   code: "MD-HTML-UNC",
+  track: "soft",
   tier: 3,
   formats: ["markdown"],
   scope: "html",

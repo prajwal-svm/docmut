@@ -11,6 +11,7 @@ import { site } from "../core/mutation-site.js";
 export const linkBroken: MutationOperator = {
   name: "LinkBroken",
   code: "MD-LNK-BRK",
+  track: "soft",
   tier: 1,
   formats: ["markdown"],
   scope: "link",
@@ -31,6 +32,7 @@ export const linkBroken: MutationOperator = {
 export const codeFenceUnclosed: MutationOperator = {
   name: "CodeFenceUnclosed",
   code: "MD-CDE-UNC",
+  track: "soft",
   tier: 1,
   formats: ["markdown"],
   scope: "code",
@@ -64,6 +66,7 @@ export const codeFenceUnclosed: MutationOperator = {
 export const mathBlockUnclosed: MutationOperator = {
   name: "MathBlockUnclosed",
   code: "MD-MTH-UNC",
+  track: "soft",
   tier: 1,
   formats: ["markdown"],
   scope: "math",
@@ -84,6 +87,7 @@ export const mathBlockUnclosed: MutationOperator = {
 export const yamlFrontmatterBroken: MutationOperator = {
   name: "YAMLFrontmatterBroken",
   code: "MD-YML-BRK",
+  track: "soft",
   tier: 1,
   formats: ["markdown"],
   scope: "yaml",

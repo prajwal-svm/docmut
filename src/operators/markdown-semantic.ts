@@ -11,6 +11,7 @@ import { site } from "../core/mutation-site.js";
 export const headerMalformed: MutationOperator = {
   name: "HeaderMalformed",
   code: "MD-HDR-MLF",
+  track: "soft",
   tier: 2,
   formats: ["markdown"],
   scope: "heading",
@@ -42,6 +43,7 @@ export const headerMalformed: MutationOperator = {
 export const tableMalformed: MutationOperator = {
   name: "TableMalformed",
   code: "MD-TBL-MLF",
+  track: "soft",
   tier: 2,
   formats: ["markdown"],
   scope: "table",

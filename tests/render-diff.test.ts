@@ -102,3 +102,30 @@ describe("render-diff equivalence", () => {
     },
   );
 });
+
+describe("evaluateMutation single-compile path", () => {
+  const hasEngine = !!findTectonic();
+
+  it.skipIf(!hasEngine)("hard track rejects still-compiling mutant", async () => {
+    const { evaluateMutation } = await import("../src/index.js");
+    const r = evaluateMutation(
+      MINIMAL_TEX,
+      EQUIVALENT_MUTANT,
+      "latex",
+      { track: "hard", engineGate: true, renderDiff: true },
+    );
+    expect(r.engineGatePassed).toBe(false);
+    expect(r.equivalentDetected).toBe(true);
+  });
+
+  it.skipIf(!hasEngine)("hard track accepts broken mutant", async () => {
+    const { evaluateMutation } = await import("../src/index.js");
+    const r = evaluateMutation(MINIMAL_TEX, BROKEN_TEX, "latex", {
+      track: "hard",
+      engineGate: true,
+      renderDiff: true,
+    });
+    expect(r.engineGatePassed).toBe(true);
+    expect(r.equivalentDetected).toBe(false);
+  });
+});

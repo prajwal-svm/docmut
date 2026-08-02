@@ -20,6 +20,7 @@ function op(
 export const braceDrop: MutationOperator = op({
   name: "BraceDrop",
   code: "TEX-BRC-DRP",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "structure",
@@ -56,6 +57,7 @@ export const braceDrop: MutationOperator = op({
 export const braceStray: MutationOperator = op({
   name: "BraceStray",
   code: "TEX-BRC-STR",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "structure",
@@ -109,6 +111,7 @@ export const braceStray: MutationOperator = op({
 export const envRename: MutationOperator = op({
   name: "EnvRename",
   code: "TEX-ENV-REN",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "structure",
@@ -153,6 +156,7 @@ export const envRename: MutationOperator = op({
 export const envUnclosed: MutationOperator = op({
   name: "EnvUnclosed",
   code: "TEX-ENV-UNC",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "structure",
@@ -179,6 +183,7 @@ export const envUnclosed: MutationOperator = op({
 export const mathDollar: MutationOperator = op({
   name: "MathDollar",
   code: "TEX-MTH-DLR",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "math",
@@ -203,6 +208,7 @@ export const mathDollar: MutationOperator = op({
 export const mathDisplay: MutationOperator = op({
   name: "MathDisplay",
   code: "TEX-MTH-DSP",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "math",
@@ -227,6 +233,7 @@ export const mathDisplay: MutationOperator = op({
 export const documentclassDrop: MutationOperator = op({
   name: "DocumentClassDrop",
   code: "TEX-CLS-DRP",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "preamble",
@@ -250,6 +257,7 @@ export const documentclassDrop: MutationOperator = op({
 export const itemMisplaced: MutationOperator = op({
   name: "ItemMisplaced",
   code: "TEX-ITM-MSN",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "list",
@@ -309,6 +317,7 @@ function replaceSpanLocal(source: string, start: number, end: number, rep: strin
 export const packageDrop: MutationOperator = op({
   name: "PackageDrop",
   code: "TEX-PKG-DRP",
+  track: "hard",
   tier: 1,
   formats: ["latex"],
   scope: "package",

@@ -46,7 +46,9 @@ export type {
   MutateOptions,
   OperatorTier,
   MutationScope,
+  FaultTrack,
 } from "./core/types.js";
+export { operatorTrack } from "./core/types.js";
 export { DEFAULT_SALT } from "./core/types.js";
 
 // PRNG
@@ -93,6 +95,8 @@ export {
   findTectonic,
   findTypst,
   findPdftotext,
+  evaluateMutation,
+  cleanupCompileDir,
   type CompileResult,
   type RenderDiffResult,
   type EngineGateResult,

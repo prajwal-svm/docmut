@@ -4,10 +4,11 @@
  * TEX-REF-UDF, TEX-LVL-SFT, TEX-UNT-CHG, TEX-FNT-SWP, TEX-ARG-DRP
  */
 
-import type { DocumentAST, MutationOperator, MutationSite } from "../core/types.js";
-import { applySpanMutation, collectNodes, filterNodes } from "../core/source-utils.js";
+import type { MutationOperator, MutationSite } from "../core/types.js";
+import { applySpanMutation, collectNodes } from "../core/source-utils.js";
 import { site } from "../core/mutation-site.js";
 import { pick } from "../core/prng.js";
+
 
 const RELATION_PAIRS: Array<[string, string]> = [
   ["\\leq", "\\geq"],
@@ -113,6 +114,7 @@ function findAllOccurrences(
 export const mathRelationSwap: MutationOperator = {
   name: "MathRelationSwap",
   code: "TEX-MTH-REL",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "math",
@@ -192,6 +194,7 @@ export const mathRelationSwap: MutationOperator = {
 export const mathOperatorSwap: MutationOperator = {
   name: "MathOperatorSwap",
   code: "TEX-MTH-OPS",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "math",
@@ -235,6 +238,7 @@ export const mathOperatorSwap: MutationOperator = {
 export const commandTypo: MutationOperator = {
   name: "CommandTypo",
   code: "TEX-CMD-TRP",
+  track: "hard",
   tier: 2,
   formats: ["latex"],
   scope: "structure",
@@ -279,6 +283,7 @@ export const commandTypo: MutationOperator = {
 export const environmentSwap: MutationOperator = {
   name: "EnvironmentSwap",
   code: "TEX-ENV-SWP",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "structure",
@@ -351,6 +356,7 @@ function escapeRe(s: string): string {
 export const labelDuplicate: MutationOperator = {
   name: "LabelDuplicate",
   code: "TEX-LBL-DUP",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "reference",
@@ -376,6 +382,7 @@ export const labelDuplicate: MutationOperator = {
 export const referenceUndefined: MutationOperator = {
   name: "ReferenceUndefined",
   code: "TEX-REF-UDF",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "reference",
@@ -404,6 +411,7 @@ export const referenceUndefined: MutationOperator = {
 export const levelShift: MutationOperator = {
   name: "LevelShift",
   code: "TEX-LVL-SFT",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "heading",
@@ -435,6 +443,7 @@ export const levelShift: MutationOperator = {
 export const unitChange: MutationOperator = {
   name: "UnitChange",
   code: "TEX-UNT-CHG",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "preamble",
@@ -482,6 +491,7 @@ export const unitChange: MutationOperator = {
 export const fontSwap: MutationOperator = {
   name: "FontSwap",
   code: "TEX-FNT-SWP",
+  track: "soft",
   tier: 2,
   formats: ["latex"],
   scope: "font",
@@ -517,6 +527,7 @@ export const fontSwap: MutationOperator = {
 export const argumentDrop: MutationOperator = {
   name: "ArgumentDrop",
   code: "TEX-ARG-DRP",
+  track: "hard",
   tier: 2,
   formats: ["latex"],
   scope: "structure",

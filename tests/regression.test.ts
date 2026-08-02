@@ -30,6 +30,7 @@ describe("fixture regressions", () => {
     expect(m!.operator).toBe("TEX-CLS-DRP");
     expect(m!.tier).toBe(1);
     expect(m!.format).toBe("latex");
+    expect(m!.track).toBe("hard");
   });
 
   it("TEX-ENV-UNC removes an end line", () => {

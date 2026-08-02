@@ -1,206 +1,161 @@
 # DocMut
 
-**AST-based document mutation testing library for LaTeX, Typst, and Markdown.**
+**AST-based document mutation testing for LaTeX, Typst, and Markdown.**
 
-DocMut applies realistic, context-aware mutations to working documents, producing broken documents for compilation repair benchmarking. It is to documents what [PIT](https://pitest.org/) is to Java and [Stryker](https://stryker-mutator.io/) is to JavaScript.
+DocMut is to documents what [PIT](https://pitest.org/) is to Java and [Stryker](https://stryker-mutator.io/) is to JavaScript. It applies realistic, context-aware mutations (fault injections) to working documents, producing broken documents for compilation-repair benchmarks such as TeXFix-Bench.
 
-## Features
+| | |
+|---|---|
+| Operators | **48** (25 LaTeX · 15 Typst · 8 Markdown) |
+| Tiers | Structural · Semantic · Realistic author errors |
+| Tracks | **hard** (compile-fail) · **soft** (warning / semantic) |
+| Determinism | mulberry32 PRNG, salt `20260802` |
+| Killer feature | **Render-diff** equivalent detection via PDF text |
+| License | MIT |
 
-- **48 mutation operators** across 3 formats and 3 tiers
-- **AST-based** — mutations target semantic document nodes, not random text
-- **Deterministic** — seeded PRNG ensures reproducible mutations across machines
-- **Render-diff equivalent detection** — compiles original + mutant, compares PDFs, and excludes equivalent mutations automatically (a feature no source-code mutation tool can offer)
-- **Plugin architecture** — add custom operators without forking
-- **Three formats** — LaTeX (25 operators), Typst (15 operators), Markdown (8 operators)
-
-## Installation
-
-```bash
-npm install @oleafly/docmut
-# or
-pnpm add @oleafly/docmut
-```
-
-## Quick start
-
-### CLI
+## Install
 
 ```bash
-# Mutate a single document with all operators, 5 variants each
-npx docmut --seed paper.tex --operators all --variants 5
-
-# Mutate with specific operators only
-npx docmut --seed paper.tex --operators TEX-BRC-DRP,TEX-MTH-REL --variants 3
-
-# Set the global salt for deterministic reproduction
-npx docmut --seed paper.tex --salt 20260802 --operators all --variants 5
+# From GitHub (recommended until npm publish)
+pnpm add github:prajwal-svm/docmut
+# or clone
+git clone https://github.com/prajwal-svm/docmut.git
+cd docmut && pnpm install && pnpm build && pnpm test
 ```
 
-### Programmatic API
+Requires Node.js ≥ 18. Optional for gated dataset generation: [`tectonic`](https://tectonic-typesetting.github.io/), [`typst`](https://typst.app/), and `pdftotext` (poppler).
 
-```typescript
-import { mutate, loadAllOperators } from '@oleafly/docmut';
+## Quick start (library)
 
-const operators = loadAllOperators(); // 48 operators
+```ts
+import { readFileSync } from "node:fs";
+import { mutateDocument, DEFAULT_SALT, ALL_OPERATORS } from "docmut";
 
-const results = mutate({
-  source: 'path/to/document.tex',
-  format: 'latex',
-  operators,
+console.log(ALL_OPERATORS.length); // 48
+
+const source = readFileSync("paper.tex", "utf8");
+const { mutations, stats, equivalents } = mutateDocument(source, {
+  salt: DEFAULT_SALT,       // 20260802
+  operators: "tier1",       // or "all" | "TEX-BRC-DRP,TEX-MTH-REL" | "latex" | "hard" via codes
   variants: 5,
-  salt: 20260802,
+  path: "paper.tex",
+  engineGate: true,         // track-aware: hard → fail compile; soft → warning/diff
+  renderDiff: true,         // drop PDF-text-equivalent mutants
 });
 
-for (const result of results) {
-  console.log(result.operatorCode);    // "TEX-BRC-DRP"
-  console.log(result.tier);            // 1
-  console.log(result.brokenSource);    // The mutated document text
-  console.log(result.equivalentDetected); // false (PDF changed)
+for (const m of mutations) {
+  console.log(m.id, m.operator, m.track, m.mutationSite);
+  // m.broken  — full mutated source
+  // m.golden  — original source
 }
 ```
+
+## CLI
+
+```bash
+pnpm cli --list-operators
+
+pnpm cli --seed fixtures/sample.tex --operators tier1 --variants 3 --out mutations.json
+
+pnpm cli --seed paper.tex --operators all --engine-gate --render-diff \
+  --write-broken ./broken/ --out gated.json
+
+# Batch catalog (TeXFix-Bench dataset layout)
+pnpm cli --catalog path/to/catalog.json --operators all --variants 2 \
+  --limit 100 --out mutations.json
+```
+
+### CLI flags
+
+| Flag | Description |
+|------|-------------|
+| `--seed <file>` | Seed document (`.tex` / `.typ` / `.md`) |
+| `--catalog <json>` | Batch mode over a catalog |
+| `--operators <spec>` | `all` · `tier1\|2\|3` · `latex\|typst\|markdown` · codes |
+| `--variants <n>` | Variants per operator (default 5) |
+| `--salt <v>` | Global salt (default `20260802`) |
+| `--engine-gate` | Keep only track-valid faults |
+| `--render-diff` | Exclude PDF-text-equivalent mutants |
+| `--write-broken <dir>` | Write standalone broken files + `instances.json` |
+| `--out <path>` | Write full JSON results |
 
 ## Operator catalog
 
-### LaTeX (25 operators)
+Full definitions: [`PLANNING.md`](./PLANNING.md).
 
-#### Tier 1: Structural (9)
+### LaTeX (25)
 
-| Code | Name | Description |
-| --- | --- | --- |
-| `TEX-BRC-DRP` | BraceDrop | Remove a closing `}` at a nested scope boundary |
-| `TEX-BRC-STR` | BraceStray | Insert an extra `{` at a scope boundary |
-| `TEX-ENV-REN` | EnvRename | Misspell `\end{...}` environment name |
-| `TEX-ENV-UNC` | EnvUnclosed | Remove `\end{...}` line entirely |
-| `TEX-MTH-DLR` | MathDollar | Remove a closing `$` after inline math |
-| `TEX-MTH-DSP` | MathDisplay | Remove a closing `\]` after display math |
-| `TEX-CLS-DRP` | DocumentClassDrop | Remove `\documentclass{...}` |
-| `TEX-ITM-MSN` | ItemMisplaced | Move `\item` outside its list environment |
-| `TEX-PKG-DRP` | PackageDrop | Remove a `\usepackage{...}` that is actually used |
+**Tier 1 Structural (hard):** `TEX-BRC-DRP` `TEX-BRC-STR` `TEX-ENV-REN` `TEX-ENV-UNC` `TEX-MTH-DLR` `TEX-MTH-DSP` `TEX-CLS-DRP` `TEX-ITM-MSN` `TEX-PKG-DRP`
 
-#### Tier 2: Semantic (10)
+**Tier 2 Semantic:** hard `TEX-CMD-TRP` `TEX-ARG-DRP` · soft `TEX-MTH-REL` `TEX-MTH-OPS` `TEX-ENV-SWP` `TEX-LBL-DUP` `TEX-REF-UDF` `TEX-LVL-SFT` `TEX-UNT-CHG` `TEX-FNT-SWP`
 
-| Code | Name | Description |
-| --- | --- | --- |
-| `TEX-MTH-REL` | MathRelationSwap | Swap `\leq` ↔ `\geq`, `<` ↔ `>` |
-| `TEX-MTH-OPS` | MathOperatorSwap | Swap `\cup` ↔ `\cap`, `\sin` ↔ `\cos` |
-| `TEX-CMD-TRP` | CommandTypo | Common misspellings of control sequences |
-| `TEX-ENV-SWP` | EnvironmentSwap | Swap `itemize` ↔ `enumerate` |
-| `TEX-LBL-DUP` | LabelDuplicate | Duplicate a `\label{...}` key |
-| `TEX-REF-UDF` | ReferenceUndefined | Replace `\ref{...}` with non-existent key |
-| `TEX-LVL-SFT` | LevelShift | `\section` → `\subsection` |
-| `TEX-UNT-CHG` | UnitChange | `12pt` → `11pt` or `13pt` |
-| `TEX-FNT-SWP` | FontSwap | `\textbf` ↔ `\textit` |
-| `TEX-ARG-DRP` | ArgumentDrop | Remove a required argument from a command |
+**Tier 3 Realistic:** hard `TEX-FNT-SPEC` `TEX-SHL-ESC` `TEX-GLS-UDF` `TEX-CSV-FMT` · soft `TEX-PKG-ORD` `TEX-HYP-DRV`
 
-#### Tier 3: Realistic Author Errors (6)
+### Typst (15) / Markdown (8)
 
-| Code | Name | Description |
-| --- | --- | --- |
-| `TEX-PKG-ORD` | PackageOrder | Move `hyperref` before other packages |
-| `TEX-FNT-SPEC` | FontSpecRemove | Remove `fontspec` import (breaks on pdfLaTeX) |
-| `TEX-SHL-ESC` | ShellEscapeReq | Introduce `minted` without `-shell-escape` |
-| `TEX-HYP-DRV` | HyperrefDriverConflict | Trigger hyperref driver auto-detection failure |
-| `TEX-GLS-UDF` | GlossaryUndefined | Reference undefined glossary key |
-| `TEX-CSV-FMT` | CsvFormatException | Break CSV/table data format |
-
-### Typst (15 operators)
-
-| Tier | Count | Examples |
-| --- | --- | --- |
-| Structural | 6 | `TYP-FNC-UNC`, `TYP-IMP-DRP`, `TYP-MTH-UNC`, `TYP-CTB-UNC`, `TYP-STR-UNC`, `TYP-LST-MLF` |
-| Semantic | 6 | `TYP-VAR-UDF`, `TYP-TPE-WRG`, `TYP-SET-INV`, `TYP-DCT-DRP`, `TYP-HDG-ORP`, `TYP-REF-UDF` |
-| Realistic | 3 | `TYP-PKG-DRP`, `TYP-FNT-CHG`, `TYP-PGE-SZE` |
-
-### Markdown (8 operators)
-
-| Tier | Count | Examples |
-| --- | --- | --- |
-| Structural | 4 | `MD-LNK-BRK`, `MD-CDE-UNC`, `MD-MTH-UNC`, `MD-YML-BRK` |
-| Semantic | 2 | `MD-HDR-MLF`, `MD-TBL-MLF` |
-| Realistic | 2 | `MD-IMG-BRK`, `MD-HTML-UNC` |
+See `pnpm cli --list-operators` or PLANNING.md.
 
 ## Design principles
 
-DocMut follows established mutation testing principles adapted for documents:
+1. **AST-based** — parse structure, mutate nodes (not random characters)
+2. **Tiered operators** — structural / semantic / realistic author errors
+3. **Hard + soft tracks** — compile-fail vs warning/semantic (TeXFix-Bench compatible)
+4. **Deterministic & seeded** — `hash(salt + seedHash + operatorCode + variantIndex)`
+5. **Render-diff equivalent detection** — compile both sides, compare `pdftotext`
+6. **Plugin registry** — cosmic-ray style operator plugins
 
-1. **AST-based, not text-based** — mutations land on semantically meaningful nodes
-2. **Deterministic** — `mulberry32` PRNG seeded by `hash(salt + documentHash + operatorCode + variantIndex)`
-3. **Render-diff equivalent detection** — compiles original and mutant to PDF; if output is identical, the mutation is equivalent and excluded
-4. **Tiered operators** — structural (basic syntax), semantic (domain-aware swaps), realistic (common author errors)
-5. **Plugin architecture** — implement the `MutationOperator` interface to add custom operators
+## Output format
 
-## Render-diff: the killer feature
-
-No source-code mutation tool can detect equivalent mutants automatically. DocMut can:
-
-1. Compile the original document to PDF
-2. Apply the mutation
-3. Compile the mutant to PDF
-4. Extract text from both PDFs via `pdftotext`
-5. If text is identical → mutation is equivalent → exclude from dataset
-
-This produces a cleaner mutation dataset than any source-code mutation benchmark.
-
-## Adding custom operators
-
-```typescript
-import { MutationOperator, MutationSite, DocumentAST } from '@oleafly/docmut';
-
-const myOperator: MutationOperator = {
-  code: 'TEX-MY-OP',
-  name: 'MyCustomOperator',
-  tier: 2,
-  format: 'latex',
-  scope: 'structure',
-
-  findSites(ast: DocumentAST): MutationSite[] {
-    // Find valid mutation locations in the AST
-    return ast.findNodes(node => node.type === 'environment');
-  },
-
-  apply(site: MutationSite, variant: number): string {
-    // Return the mutated text for this site and variant
-    return site.originalText.replace('\\begin', '\\egin');
-  },
-};
-```
-
-## Testing
-
-```bash
-# Run all 55 tests
-pnpm test
-
-# Run specific test suite
-pnpm vitest run tests/determinism.test.ts
-```
-
-## Requirements
-
-- Node.js 18+
-- Tectonic 0.17.0 (for render-diff equivalent detection)
-- Poppler `pdftotext` (for PDF text extraction)
-- Typst CLI (for Typst render-diff)
-
-## Used in
-
-- **TeXFix-Bench v0.4** — multi-format document compilation repair benchmark (10,437 instances)
-- **Engine-Transfer-Bench** — multi-engine document compilation comparison
-
-## Citation
-
-If you use DocMut in your research, please cite:
-
-```bibtex
-@software{docmut,
-  author = {Prajwal S. Venkateshmurthy},
-  title = {DocMut: AST-Based Document Mutation Testing Library},
-  year = {2026},
-  url = {https://github.com/Oleafly/docmut},
-  license = {MIT}
+```json
+{
+  "id": "docmut-a3f2e1b8c4",
+  "operator": "TEX-MTH-REL",
+  "operatorName": "MathRelationSwap",
+  "tier": 2,
+  "track": "soft",
+  "format": "latex",
+  "scope": "math",
+  "seedDocument": "article.tex",
+  "seedHash": "sha256:...",
+  "mutationSite": { "line": 27, "column": 14, "nodeType": "math_inline" },
+  "original": "\\leq",
+  "mutated": "\\geq",
+  "variantIndex": 2,
+  "prngSeed": "20260802:55cf...:TEX-MTH-REL:2",
+  "broken": "...",
+  "golden": "...",
+  "equivalentDetected": false,
+  "engineGatePassed": true
 }
 ```
 
+`--write-broken` also emits TeXFix-Bench-compatible `instances.json`.
+
+## Adding an operator
+
+```ts
+import type { MutationOperator } from "docmut";
+import { defaultRegistry } from "docmut";
+
+const myOp: MutationOperator = {
+  name: "MyOperator",
+  code: "TEX-MY-OP",
+  tier: 2,
+  track: "hard",
+  formats: ["latex"],
+  scope: "structure",
+  rationale: "…",
+  findMutationSites(ast) { return []; },
+  apply(ast, site, variantIndex, rng) { return null; },
+};
+
+defaultRegistry.register(myOp);
+```
+
+## Citation
+
+See [`CITATION.cff`](./CITATION.cff). Design rationale: [`PLANNING.md`](./PLANNING.md).
+
 ## License
 
-MIT © [Prajwal S. Venkateshmurthy](https://github.com/prajwal-svm) / [Oleafly](https://github.com/Oleafly)
+MIT — see [`LICENSE`](./LICENSE).

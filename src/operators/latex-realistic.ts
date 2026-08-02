@@ -11,6 +11,7 @@ import { site } from "../core/mutation-site.js";
 export const packageOrder: MutationOperator = {
   name: "PackageOrder",
   code: "TEX-PKG-ORD",
+  track: "soft",
   tier: 3,
   formats: ["latex"],
   scope: "package",
@@ -85,6 +86,7 @@ export const packageOrder: MutationOperator = {
 export const fontspecRemove: MutationOperator = {
   name: "FontSpecRemove",
   code: "TEX-FNT-SPEC",
+  track: "hard",
   tier: 3,
   formats: ["latex"],
   scope: "package",
@@ -110,6 +112,7 @@ export const fontspecRemove: MutationOperator = {
 export const shellEscapeRequired: MutationOperator = {
   name: "ShellEscapeReq",
   code: "TEX-SHL-ESC",
+  track: "hard",
   tier: 3,
   formats: ["latex"],
   scope: "package",
@@ -158,6 +161,7 @@ export const shellEscapeRequired: MutationOperator = {
 export const hyperrefDriverConflict: MutationOperator = {
   name: "HyperrefDriverConflict",
   code: "TEX-HYP-DRV",
+  track: "soft",
   tier: 3,
   formats: ["latex"],
   scope: "package",
@@ -207,6 +211,7 @@ export const hyperrefDriverConflict: MutationOperator = {
 export const glossaryUndefined: MutationOperator = {
   name: "GlossaryUndefined",
   code: "TEX-GLS-UDF",
+  track: "hard",
   tier: 3,
   formats: ["latex"],
   scope: "reference",
@@ -255,6 +260,7 @@ export const glossaryUndefined: MutationOperator = {
 export const csvFormatException: MutationOperator = {
   name: "CsvFormatException",
   code: "TEX-CSV-FMT",
+  track: "hard",
   tier: 3,
   formats: ["latex"],
   scope: "table",

@@ -1,17 +1,27 @@
 {
   "name": "docmut",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AST-based document mutation testing library for LaTeX, Typst, and Markdown",
   "type": "module",
   "license": "MIT",
-  "author": "TeXFix-Bench contributors",
+  "author": "Prajwal S. Venkateshmurthy",
+  "homepage": "https://github.com/prajwal-svm/docmut",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prajwal-svm/docmut.git"
+  },
+  "bugs": {
+    "url": "https://github.com/prajwal-svm/docmut/issues"
+  },
   "keywords": [
     "mutation-testing",
     "latex",
     "typst",
     "markdown",
     "document-repair",
-    "benchmark"
+    "benchmark",
+    "tectonic",
+    "render-diff"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,10 +42,12 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "tsc -p tsconfig.json && vitest run",
     "test": "vitest run",
     "test:watch": "vitest",
     "cli": "tsx src/cli.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "tsc -p tsconfig.json"
   },
   "engines": {
     "node": ">=18"

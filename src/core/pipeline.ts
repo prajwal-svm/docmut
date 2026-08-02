@@ -5,16 +5,17 @@
 import type {
   DocumentAST,
   DocumentFormat,
+  FaultTrack,
   MutateOptions,
   MutationOperator,
   MutationResult,
   MutationSite,
 } from "./types.js";
-import { DEFAULT_SALT } from "./types.js";
+import { DEFAULT_SALT, operatorTrack } from "./types.js";
 import { createMutationRng, mutationId, pick, sha256, shuffle } from "./prng.js";
 import { parseDocument } from "./mutation-site.js";
 import { defaultRegistry, OperatorRegistry } from "./registry.js";
-import { engineGate, renderDiff, staticGate } from "./render-diff.js";
+import { evaluateMutation, staticGate } from "./render-diff.js";
 
 export interface PipelineStats {
   attempted: number;
@@ -24,13 +25,27 @@ export interface PipelineStats {
   skippedEngineGate: number;
   skippedEquivalent: number;
   byOperator: Record<string, number>;
+  byTrack: Record<FaultTrack, number>;
 }
 
 export interface PipelineResult {
   mutations: MutationResult[];
+  /** Equivalents excluded from `mutations` (for transparency logs). */
+  equivalents: MutationResult[];
   stats: PipelineStats;
   format: DocumentFormat;
   seedHash: string;
+}
+
+function wantsEngineGate(opts: MutateOptions): boolean {
+  return opts.engineGate === true || opts.engineGate === "auto" ||
+    opts.engineGate === "hard" || opts.engineGate === "soft";
+}
+
+function trackFilter(opts: MutateOptions, track: FaultTrack): boolean {
+  if (opts.engineGate === "hard") return track === "hard";
+  if (opts.engineGate === "soft") return track === "soft";
+  return true; // auto / true / false
 }
 
 /**
@@ -44,14 +59,14 @@ export function mutateDocument(
   const salt = options.salt ?? DEFAULT_SALT;
   const variants = options.variants ?? 5;
   const path = options.path ?? "document";
-  const formatHint = options.path
-    ? undefined
-    : undefined;
+  const excludeEquivalent = options.excludeEquivalent !== false;
+  const timeoutMs = options.compileTimeoutMs ?? 60_000;
 
-  const ast = parseDocument(source, formatHint as DocumentFormat | undefined, path);
-  const operators = registry.select(options.operators ?? "all").filter((op) =>
-    op.formats.includes(ast.format),
-  );
+  const ast = parseDocument(source, undefined, path);
+  const operators = registry
+    .select(options.operators ?? "all")
+    .filter((op) => op.formats.includes(ast.format))
+    .filter((op) => trackFilter(options, operatorTrack(op)));
 
   const stats: PipelineStats = {
     attempted: 0,
@@ -61,12 +76,15 @@ export function mutateDocument(
     skippedEngineGate: 0,
     skippedEquivalent: 0,
     byOperator: {},
+    byTrack: { hard: 0, soft: 0 },
   };
 
   const mutations: MutationResult[] = [];
+  const equivalents: MutationResult[] = [];
   const seen = new Set<string>();
 
   for (const op of operators) {
+    const track = operatorTrack(op);
     const sites = op.findMutationSites(ast);
     if (!sites.length) {
       stats.skippedNoSite++;
@@ -94,7 +112,6 @@ export function mutateDocument(
         continue;
       }
 
-      // Dedup identical broken sources
       const brokenSha = sha256(applied.source);
       if (seen.has(`${op.code}:${brokenSha}`)) {
         stats.skippedApplyFailed++;
@@ -109,37 +126,30 @@ export function mutateDocument(
         brokenPass: null,
       };
 
-      if (options.engineGate || options.renderDiff) {
-        if (options.renderDiff) {
-          const rd = renderDiff(ast.source, applied.source, ast.format);
-          equivalentDetected = rd.equivalent;
-          engineMeta = {
-            goldenPass: rd.goldenCompile.pass,
-            brokenPass: rd.mutantCompile.pass,
-            brokenErrors: rd.mutantCompile.errors,
-          };
-          if (equivalentDetected) {
-            stats.skippedEquivalent++;
-            // Still record with flag if caller wants transparency; default exclude from kept
-            // We include in results with equivalentDetected=true for logging, but count separately.
-          }
-        }
-
-        if (options.engineGate) {
-          const gate = engineGate(ast.source, applied.source, ast.format);
-          engineGatePassed = gate.passed;
-          engineMeta = {
-            goldenPass: gate.goldenPass,
-            brokenPass: gate.brokenPass,
-            brokenErrors: gate.brokenErrors,
-          };
-          if (!engineGatePassed && !equivalentDetected) {
-            stats.skippedEngineGate++;
-            continue;
-          }
+      if (wantsEngineGate(options) || options.renderDiff) {
+        const evalResult = evaluateMutation(ast.source, applied.source, ast.format, {
+          timeoutMs,
+          track,
+          renderDiff: !!options.renderDiff,
+          engineGate: wantsEngineGate(options),
+        });
+        equivalentDetected = evalResult.equivalentDetected;
+        engineGatePassed = wantsEngineGate(options)
+          ? evalResult.engineGatePassed
+          : true;
+        engineMeta = {
+          goldenPass: evalResult.goldenCompile.pass,
+          brokenPass: evalResult.brokenCompile.pass,
+          brokenErrors: evalResult.brokenCompile.errors,
+          brokenWarnings: evalResult.brokenCompile.warnings,
+          reason: evalResult.reason,
+        };
+        if (equivalentDetected) stats.skippedEquivalent++;
+        if (wantsEngineGate(options) && !engineGatePassed && !equivalentDetected) {
+          stats.skippedEngineGate++;
+          continue;
         }
       } else {
-        // Static: must differ
         const g = staticGate(ast.source, applied.source);
         engineGatePassed = g.passed;
         if (!engineGatePassed) {
@@ -148,22 +158,13 @@ export function mutateDocument(
         }
       }
 
-      // Exclude equivalent mutants from the final dataset (still transparent via stats)
-      if (equivalentDetected) {
-        continue;
-      }
-
-      // For engine gate mode, only keep if gate passed
-      if (options.engineGate && !engineGatePassed) {
-        continue;
-      }
-
       const id = mutationId(path, op.code, k, applied.original, applied.mutated);
       const result: MutationResult = {
         id,
         operator: op.code,
         operatorName: op.name,
         tier: op.tier,
+        track,
         format: ast.format,
         scope: op.scope,
         seedDocument: path,
@@ -181,7 +182,7 @@ export function mutateDocument(
         golden: ast.source,
         brokenSha,
         goldenSha: ast.sha256,
-        equivalentDetected: false,
+        equivalentDetected,
         engineGatePassed,
         engine: engineMeta,
         groundTruthPatch: {
@@ -192,20 +193,36 @@ export function mutateDocument(
         replication: {
           salt,
           k,
-          oracle: options.engineGate ? "engine" : "static",
+          oracle: wantsEngineGate(options)
+            ? "engine"
+            : options.renderDiff
+              ? "render-diff"
+              : "static",
         },
       };
+
+      if (equivalentDetected) {
+        equivalents.push(result);
+        if (excludeEquivalent) continue;
+      }
+
+      if (wantsEngineGate(options) && !engineGatePassed) {
+        continue;
+      }
 
       mutations.push(result);
       stats.kept++;
       stats.byOperator[op.code] = (stats.byOperator[op.code] ?? 0) + 1;
+      stats.byTrack[track]++;
     }
   }
 
   mutations.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  equivalents.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 
   return {
     mutations,
+    equivalents,
     stats,
     format: ast.format,
     seedHash: ast.sha256,
@@ -213,7 +230,7 @@ export function mutateDocument(
 }
 
 /**
- * Mutate using a pre-parsed AST (avoids re-parse when sites are precomputed).
+ * Mutate using a pre-parsed AST (re-parses source; path preserved).
  */
 export function mutateWithAst(
   ast: DocumentAST,

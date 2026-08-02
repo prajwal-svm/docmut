@@ -11,6 +11,7 @@ import { site } from "../core/mutation-site.js";
 export const packageDrop: MutationOperator = {
   name: "PackageDrop",
   code: "TYP-PKG-DRP",
+  track: "hard",
   tier: 3,
   formats: ["typst"],
   scope: "package",
@@ -33,6 +34,7 @@ export const packageDrop: MutationOperator = {
 export const fontChange: MutationOperator = {
   name: "FontChange",
   code: "TYP-FNT-CHG",
+  track: "soft",
   tier: 3,
   formats: ["typst"],
   scope: "font",
@@ -112,6 +114,7 @@ export const fontChange: MutationOperator = {
 export const pageSizeChange: MutationOperator = {
   name: "PageSizeChange",
   code: "TYP-PGE-SZE",
+  track: "hard",
   tier: 3,
   formats: ["typst"],
   scope: "structure",

@@ -12,6 +12,7 @@ import { pick } from "../core/prng.js";
 export const varUndefined: MutationOperator = {
   name: "VarUndefined",
   code: "TYP-VAR-UDF",
+  track: "hard",
   tier: 2,
   formats: ["typst"],
   scope: "structure",
@@ -47,6 +48,7 @@ export const varUndefined: MutationOperator = {
 export const typeWrong: MutationOperator = {
   name: "TypeWrong",
   code: "TYP-TPE-WRG",
+  track: "hard",
   tier: 2,
   formats: ["typst"],
   scope: "structure",
@@ -81,6 +83,7 @@ export const typeWrong: MutationOperator = {
 export const setRuleInvalid: MutationOperator = {
   name: "SetRuleInvalid",
   code: "TYP-SET-INV",
+  track: "hard",
   tier: 2,
   formats: ["typst"],
   scope: "structure",
@@ -112,6 +115,7 @@ export const setRuleInvalid: MutationOperator = {
 export const dictKeyDrop: MutationOperator = {
   name: "DictKeyDrop",
   code: "TYP-DCT-DRP",
+  track: "hard",
   tier: 2,
   formats: ["typst"],
   scope: "structure",
@@ -151,6 +155,7 @@ export const dictKeyDrop: MutationOperator = {
 export const headingOrphan: MutationOperator = {
   name: "HeadingOrphan",
   code: "TYP-HDG-ORP",
+  track: "soft",
   tier: 2,
   formats: ["typst"],
   scope: "heading",
@@ -181,6 +186,7 @@ export const headingOrphan: MutationOperator = {
 export const refUndefined: MutationOperator = {
   name: "RefUndefined",
   code: "TYP-REF-UDF",
+  track: "soft",
   tier: 2,
   formats: ["typst"],
   scope: "reference",

@@ -11,6 +11,7 @@ import { site } from "../core/mutation-site.js";
 export const funcUnclosed: MutationOperator = {
   name: "FuncUnclosed",
   code: "TYP-FNC-UNC",
+  track: "hard",
   tier: 1,
   formats: ["typst"],
   scope: "structure",
@@ -35,6 +36,7 @@ export const funcUnclosed: MutationOperator = {
 export const importDrop: MutationOperator = {
   name: "ImportDrop",
   code: "TYP-IMP-DRP",
+  track: "hard",
   tier: 1,
   formats: ["typst"],
   scope: "package",
@@ -57,6 +59,7 @@ export const importDrop: MutationOperator = {
 export const mathUnclosed: MutationOperator = {
   name: "MathUnclosed",
   code: "TYP-MTH-UNC",
+  track: "hard",
   tier: 1,
   formats: ["typst"],
   scope: "math",
@@ -79,6 +82,7 @@ export const mathUnclosed: MutationOperator = {
 export const contentBlockUnclosed: MutationOperator = {
   name: "ContentBlockUnclosed",
   code: "TYP-CTB-UNC",
+  track: "hard",
   tier: 1,
   formats: ["typst"],
   scope: "structure",
@@ -103,6 +107,7 @@ export const contentBlockUnclosed: MutationOperator = {
 export const stringUnclosed: MutationOperator = {
   name: "StringUnclosed",
   code: "TYP-STR-UNC",
+  track: "hard",
   tier: 1,
   formats: ["typst"],
   scope: "structure",
@@ -125,6 +130,7 @@ export const stringUnclosed: MutationOperator = {
 export const listMalformed: MutationOperator = {
   name: "ListMalformed",
   code: "TYP-LST-MLF",
+  track: "hard",
   tier: 1,
   formats: ["typst"],
   scope: "list",
