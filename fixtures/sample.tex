@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\title{DocMut Sample}
+\author{Test Author}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A short abstract with math $x \leq y$ and bold \textbf{text}.
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+We study $f:\mathbb{R}^d \to \mathbb{R}$ where $a \leq b$ and $x \in S$.
+See Section~\ref{sec:method}.
+
+\section{Method}\label{sec:method}
+\begin{equation}\label{eq:main}
+  \sum_{i=1}^{n} \sin(x_i) \leq \prod_{i=1}^{n} \cos(x_i)
+\end{equation}
+Also display:
+\[
+  \frac{a}{b} + \sqrt{c}
+\]
+
+\begin{itemize}
+  \item First item
+  \item Second item with $\alpha \geq \beta$
+\end{itemize}
+
+\begin{enumerate}
+  \item Numbered one
+  \item Numbered two
+\end{enumerate}
+
+\begin{table}[h]
+\centering
+\caption{Results}
+\label{tab:res}
+\begin{tabular}{lc}
+\toprule
+Step & Value \\
+\midrule
+0.1 & $1.2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:res} and Equation~\eqref{eq:main} summarize findings.
+
+\subsection{Details}\label{sec:details}
+\textit{Italic} and \texttt{code} fonts. Cite~\cite{fake2020}.
+
+\end{document}
