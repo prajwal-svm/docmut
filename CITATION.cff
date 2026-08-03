@@ -1,17 +1,29 @@
 cff-version: 1.2.0
 message: "If you use DocMut, please cite it."
-title: "DocMut: AST-based Document Mutation Testing for LaTeX, Typst, and Markdown"
-version: 0.1.1
+title: "DocMut: Deterministic Multi-Format Document Mutation for LaTeX, Typst, and Markdown"
+version: 0.2.0
 date-released: "2026-08-02"
 license: MIT
 authors:
   - family-names: Venkateshmurthy
     given-names: Prajwal S.
 repository-code: "https://github.com/prajwal-svm/docmut"
+url: "https://github.com/prajwal-svm/docmut"
 keywords:
   - mutation testing
   - LaTeX
   - Typst
   - Markdown
   - document repair
-  - benchmark
+  - benchmark construction
+  - synthetic faults
+  - engine-gated evaluation
+abstract: >-
+  DocMut is a deterministic, multi-format document mutation library for
+  constructing engine-validated synthetic faults in LaTeX, Typst, and Markdown.
+  It targets scholarly document structure, separates hard compile failures from
+  soft diagnostic faults, retains mutants under a pinned compilation gate, and
+  optionally drops render-text-equivalent mutants via PDF text comparison. It
+  uses a surface structural parse adequate for site selection, not a full TeX
+  expansion engine, and does not claim natural error prevalence or complete
+  semantic equivalence detection.

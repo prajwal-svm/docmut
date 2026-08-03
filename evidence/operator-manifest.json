@@ -1,0 +1,543 @@
+{
+  "version": "0.2.0",
+  "generatedAt": "2026-08-03T00:28:20.687Z",
+  "operatorCount": 48,
+  "hardCount": 27,
+  "softCount": 21,
+  "byFormat": {
+    "latex": 25,
+    "typst": 15,
+    "markdown": 8
+  },
+  "operators": [
+    {
+      "code": "MD-CDE-UNC",
+      "name": "CodeFenceUnclosed",
+      "tier": 1,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "code",
+      "rationale": "Forgetting to close a fenced code block swallows subsequent content."
+    },
+    {
+      "code": "MD-HDR-MLF",
+      "name": "HeaderMalformed",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "heading",
+      "rationale": "Skipping heading levels breaks document outline structure."
+    },
+    {
+      "code": "MD-HTML-UNC",
+      "name": "HTMLTagUnclosed",
+      "tier": 3,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "html",
+      "rationale": "Unclosed HTML tags break pandoc and many Markdown renderers."
+    },
+    {
+      "code": "MD-IMG-BRK",
+      "name": "ImageBroken",
+      "tier": 3,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "link",
+      "rationale": "Referencing a missing image is a common documentation mistake."
+    },
+    {
+      "code": "MD-LNK-BRK",
+      "name": "LinkBroken",
+      "tier": 1,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "link",
+      "rationale": "Unclosed markdown links are a common authoring typo."
+    },
+    {
+      "code": "MD-MTH-UNC",
+      "name": "MathBlockUnclosed",
+      "tier": 1,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "math",
+      "rationale": "Unclosed display-math $$ breaks pandoc and many MD processors."
+    },
+    {
+      "code": "MD-TBL-MLF",
+      "name": "TableMalformed",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "table",
+      "rationale": "Broken table separator rows cause markdown table render failures."
+    },
+    {
+      "code": "MD-YML-BRK",
+      "name": "YAMLFrontmatterBroken",
+      "tier": 1,
+      "track": "soft",
+      "formats": [
+        "markdown"
+      ],
+      "scope": "yaml",
+      "rationale": "Broken YAML frontmatter delimiters confuse static site generators."
+    },
+    {
+      "code": "TEX-ARG-DRP",
+      "name": "ArgumentDrop",
+      "tier": 2,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "Authors forget a required argument (e.g. \\frac{a} missing second arg)."
+    },
+    {
+      "code": "TEX-BRC-DRP",
+      "name": "BraceDrop",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "Unclosed groups are among the most common TeX errors ('Runaway argument', 'Extra }, or forgotten $')."
+    },
+    {
+      "code": "TEX-BRC-STR",
+      "name": "BraceStray",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "An unbalanced '{' silently swallows following tokens, a frequent copy-paste error."
+    },
+    {
+      "code": "TEX-CLS-DRP",
+      "name": "DocumentClassDrop",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "preamble",
+      "rationale": "Author accidentally deletes the preamble class declaration."
+    },
+    {
+      "code": "TEX-CMD-TRP",
+      "name": "CommandTypo",
+      "tier": 2,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "Undefined control sequence from a realistic author typo."
+    },
+    {
+      "code": "TEX-CSV-FMT",
+      "name": "CsvFormatException",
+      "tier": 3,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "table",
+      "rationale": "Author has wrong column count in CSV data used by csvsimple/pgfplotstable."
+    },
+    {
+      "code": "TEX-ENV-REN",
+      "name": "EnvRename",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "Mismatched \\begin/\\end names raise 'Environment ... undefined' and 'Missing \\endgroup'."
+    },
+    {
+      "code": "TEX-ENV-SWP",
+      "name": "EnvironmentSwap",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "Authors pick the wrong environment (itemize vs enumerate, table vs tabular)."
+    },
+    {
+      "code": "TEX-ENV-UNC",
+      "name": "EnvUnclosed",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "structure",
+      "rationale": "Forgetting to close an environment produces '\\begin{...} ended by \\end{document}'."
+    },
+    {
+      "code": "TEX-FNT-SPEC",
+      "name": "FontSpecRemove",
+      "tier": 3,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "package",
+      "rationale": "Engine-specific package dependency: fontspec fails on pdfLaTeX."
+    },
+    {
+      "code": "TEX-FNT-SWP",
+      "name": "FontSwap",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "font",
+      "rationale": "Authors apply the wrong font command (textbf ↔ textit ↔ texttt)."
+    },
+    {
+      "code": "TEX-GLS-UDF",
+      "name": "GlossaryUndefined",
+      "tier": 3,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "reference",
+      "rationale": "Author forgets to define a glossary entry before using \\gls."
+    },
+    {
+      "code": "TEX-HYP-DRV",
+      "name": "HyperrefDriverConflict",
+      "tier": 3,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "package",
+      "rationale": "Driver auto-detection failure from premature hyperref setup."
+    },
+    {
+      "code": "TEX-ITM-MSN",
+      "name": "ItemMisplaced",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "list",
+      "rationale": "Copy-paste error placing \\item outside itemize/enumerate."
+    },
+    {
+      "code": "TEX-LBL-DUP",
+      "name": "LabelDuplicate",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "reference",
+      "rationale": "Copy-paste error duplicating a \\label key causes multiply-defined labels."
+    },
+    {
+      "code": "TEX-LVL-SFT",
+      "name": "LevelShift",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "heading",
+      "rationale": "Authors get heading levels wrong (section → subsection)."
+    },
+    {
+      "code": "TEX-MTH-DLR",
+      "name": "MathDollar",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "math",
+      "rationale": "Missing '$' triggers 'Missing $ inserted' and cascades across the rest of the file."
+    },
+    {
+      "code": "TEX-MTH-DSP",
+      "name": "MathDisplay",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "math",
+      "rationale": "An unclosed \\[ leaves math mode running to end-of-file."
+    },
+    {
+      "code": "TEX-MTH-OPS",
+      "name": "MathOperatorSwap",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "math",
+      "rationale": "Authors pick the wrong mathematical operator (cup/cap, sin/cos, sum/prod)."
+    },
+    {
+      "code": "TEX-MTH-REL",
+      "name": "MathRelationSwap",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "math",
+      "rationale": "Authors confuse inequality direction in mathematical expressions."
+    },
+    {
+      "code": "TEX-PKG-DRP",
+      "name": "PackageDrop",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "package",
+      "rationale": "Author removes a package that is still required by macros in the body."
+    },
+    {
+      "code": "TEX-PKG-ORD",
+      "name": "PackageOrder",
+      "tier": 3,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "package",
+      "rationale": "hyperref must be loaded last — loading it early is a classic author mistake."
+    },
+    {
+      "code": "TEX-REF-UDF",
+      "name": "ReferenceUndefined",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "reference",
+      "rationale": "Author renames a label but forgets to update refs."
+    },
+    {
+      "code": "TEX-SHL-ESC",
+      "name": "ShellEscapeReq",
+      "tier": 3,
+      "track": "hard",
+      "formats": [
+        "latex"
+      ],
+      "scope": "package",
+      "rationale": "Authors use minted without knowing the --shell-escape flag is required."
+    },
+    {
+      "code": "TEX-UNT-CHG",
+      "name": "UnitChange",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "latex"
+      ],
+      "scope": "preamble",
+      "rationale": "Off-by-one in spacing/font size values (12pt → 11pt, 2cm → 3cm)."
+    },
+    {
+      "code": "TYP-CTB-UNC",
+      "name": "ContentBlockUnclosed",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Unclosed content block ] is a common Typst syntax error."
+    },
+    {
+      "code": "TYP-DCT-DRP",
+      "name": "DictKeyDrop",
+      "tier": 2,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Dropping a required dictionary key breaks function calls."
+    },
+    {
+      "code": "TYP-FNC-UNC",
+      "name": "FuncUnclosed",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Unclosed function call parentheses break Typst parsing."
+    },
+    {
+      "code": "TYP-FNT-CHG",
+      "name": "FontChange",
+      "tier": 3,
+      "track": "soft",
+      "formats": [
+        "typst"
+      ],
+      "scope": "font",
+      "rationale": "Setting a non-existent font is a common cross-platform Typst error."
+    },
+    {
+      "code": "TYP-HDG-ORP",
+      "name": "HeadingOrphan",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "typst"
+      ],
+      "scope": "heading",
+      "rationale": "Accidentally deleting section body leaves an orphan heading."
+    },
+    {
+      "code": "TYP-IMP-DRP",
+      "name": "ImportDrop",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "package",
+      "rationale": "Removing an import breaks subsequent uses of imported symbols."
+    },
+    {
+      "code": "TYP-LST-MLF",
+      "name": "ListMalformed",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "list",
+      "rationale": "Removing list markers produces invalid or unintended document structure."
+    },
+    {
+      "code": "TYP-MTH-UNC",
+      "name": "MathUnclosed",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "math",
+      "rationale": "Unclosed math mode $ cascades through the rest of the document."
+    },
+    {
+      "code": "TYP-PGE-SZE",
+      "name": "PageSizeChange",
+      "tier": 3,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Invalid page paper size causes Typst set-rule errors."
+    },
+    {
+      "code": "TYP-PKG-DRP",
+      "name": "PackageDrop",
+      "tier": 3,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "package",
+      "rationale": "Removing a used package import breaks the document at compile time."
+    },
+    {
+      "code": "TYP-REF-UDF",
+      "name": "RefUndefined",
+      "tier": 2,
+      "track": "soft",
+      "formats": [
+        "typst"
+      ],
+      "scope": "reference",
+      "rationale": "Referencing an undefined label produces Typst reference errors."
+    },
+    {
+      "code": "TYP-SET-INV",
+      "name": "SetRuleInvalid",
+      "tier": 2,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Invalid #set rule values are a frequent Typst configuration mistake."
+    },
+    {
+      "code": "TYP-STR-UNC",
+      "name": "StringUnclosed",
+      "tier": 1,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Unclosed string literals break Typst compilation."
+    },
+    {
+      "code": "TYP-TPE-WRG",
+      "name": "TypeWrong",
+      "tier": 2,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Passing the wrong type to a function argument fails Typst type checking."
+    },
+    {
+      "code": "TYP-VAR-UDF",
+      "name": "VarUndefined",
+      "tier": 2,
+      "track": "hard",
+      "formats": [
+        "typst"
+      ],
+      "scope": "structure",
+      "rationale": "Referencing an undefined variable is a common Typst authoring error."
+    }
+  ],
+  "contentSha256": "47214311d5a07deaf127e0bdbbee7cc0e6fe78836a359dc5f2eb91f8b7fce5ea"
+}

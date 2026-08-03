@@ -102,6 +102,18 @@ export class OperatorRegistry {
         for (const op of this.byFormat("markdown")) selected.set(op.code, op);
         continue;
       }
+      if (lower === "hard") {
+        for (const op of this.all()) {
+          if ((op.track ?? "hard") === "hard") selected.set(op.code, op);
+        }
+        continue;
+      }
+      if (lower === "soft") {
+        for (const op of this.all()) {
+          if (op.track === "soft") selected.set(op.code, op);
+        }
+        continue;
+      }
       // Direct code or name match
       const byCode = this.ops.get(token) ?? this.ops.get(token.toUpperCase());
       if (byCode) {

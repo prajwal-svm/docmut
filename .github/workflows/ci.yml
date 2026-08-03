@@ -31,3 +31,10 @@ jobs:
         run: pnpm build
       - name: CLI smoke
         run: node dist/cli.js --list-operators | head -20
+      - name: Operator manifest
+        run: pnpm adequacy --manifest-only --out evidence/operator-manifest.json
+      - name: Manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: operator-manifest-node-${{ matrix.node-version }}
+          path: evidence/operator-manifest.json

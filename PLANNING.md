@@ -1,18 +1,19 @@
-# DocMut: A Realistic Document Mutation Testing Library
+# DocMut: Design Notes
 
-**Working name:** DocMut (Document Mutation)
-**Status:** Design phase
-**Location:** `texfix-bench/mutation-library/`
-**License:** MIT (code) + CC0-1.0 (operator documentation)
-**Artifact type:** Contributed artifact alongside TeXFix-Bench v0.4
+**Name:** DocMut (Document Mutation)  
+**Status:** Implemented (public package 0.2.x)  
+**License:** MIT  
+**Artifact type:** Standalone library used for TeXFix-Bench construction (v0.3 / v0.4)
+
+Normative public claims live in `docs/SCOPE-AND-NONGOALS.md` and the README. This file retains design history and operator intent.
 
 ---
 
 ## What This Is
 
-DocMut is a deterministic, AST-based mutation testing library for structured documents (LaTeX, Typst, Markdown). It applies realistic, context-aware mutations that model real authoring errors. It is to documents what PIT is to Java and Stryker is to JavaScript.
+DocMut is a deterministic, multi-format document mutation library for constructing engine-validated synthetic faults in LaTeX, Typst, and Markdown. It applies context-aware mutations using a surface structural parse adequate for site selection (not full TeX expansion). Methodologically it follows PIT/Stryker-style operator design for **documents**, not application unit-test mutation scores.
 
-**This is a standalone contribution.** Other researchers can use DocMut independently of TeXFix-Bench to generate broken documents for their own experiments. The mutation library is citable on its own.
+**Standalone:** usable independently of TeXFix-Bench to generate broken documents for repair experiments.
 
 ---
 
@@ -20,14 +21,18 @@ DocMut is a deterministic, AST-based mutation testing library for structured doc
 
 These principles are synthesized from PIT (Java), Stryker (JS/TS), Mull (C/C++), MutPy (Python), cosmic-ray (Python), and the Jia & Harman (2011) survey.
 
-### Principle 1: AST-Based, Not Text-Based
+### Principle 1: Surface Structural Sites, Not Raw Text Soup
 
-Mutate parsed document structure, not raw text. This ensures:
-- Mutations land on semantically meaningful locations (inside a math expression, at an environment boundary, on a command name)
-- No broken mutations (e.g., removing a brace inside a comment)
+Mutate document structure at known spans, not arbitrary character flips. This ensures:
+- Mutations land on meaningful locations (math, environment boundaries, command names)
+- Active-mask awareness reduces edits inside comments/verbatim where implemented
 - Deterministic and reproducible
 
-**Implementation:** Parse LaTeX via a lightweight parser (existing TeXFix-Bench uses regex-based parsing; v0.4 should upgrade to a tree-sitter or unified-language-server parser). Parse Typst via its native syntax tree. Parse Markdown via a unified/remark AST.
+**Implementation:** Surface structural scanners per format (`parser-latex.ts`, `parser-typst.ts`, `parser-markdown.ts`). This is **not** full TeX expansion. Optional future work: deeper grammars (e.g. tree-sitter) behind a measured adequacy comparison—not a claim change without data.
+
+### Principle 1b: Engine Gate Before Scientific Use
+
+Hard mutants retained for benchmarks must satisfy compile(golden)=ok and compile(broken)=fail under a **pinned** engine. Soft mutants use soft criteria. See `docs/ORACLE-AND-GATES.md`.
 
 ### Principle 2: Tiered Operators (not flat list)
 
@@ -39,11 +44,11 @@ Every mature mutation tool converges on tiers. DocMut follows:
 | **Tier 2: Semantic** | Domain-aware swaps (command swaps, math operator swaps, unit changes) | 10-15 operators | Stryker MethodExpression (`endsWith`↔`startsWith`) |
 | **Tier 3: Realistic Author Errors** | Errors mined from common mistakes (forgotten packages, wrong syntax patterns) | 8-12 operators | PIT type-aware returns (`String`→`""`) |
 
-### Principle 3: Equivalent Mutant Detection via Render-Diff
+### Principle 3: Partial Equivalent Filtering via Render-Text Diff
 
-Code mutation tools struggle with equivalent mutants (mutations that don't change behavior). **DocMut has a unique advantage:** it can render both the original and mutated document to PDF and compare. If the PDFs are byte-identical (after normalization), the mutation is equivalent and should be discarded.
+Code mutation tools struggle with equivalent mutants. Documents admit a **partial** filter: compile golden and mutant under a pinned engine, extract PDF text (`pdftotext`), normalize, and drop identity matches.
 
-**This is the killer feature.** No code mutation tool can do this. It makes DocMut's output cleaner than any source-code mutation tool.
+This is document-specific and valuable. It is **not** visual identity, math semantic identity, or a complete classical equivalent-mutant solution. Claim language must stay partial (see `docs/SCOPE-AND-NONGOALS.md`).
 
 ### Principle 4: Deterministic and Seeded
 

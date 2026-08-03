@@ -1,7 +1,7 @@
 {
   "name": "docmut",
-  "version": "0.1.1",
-  "description": "AST-based document mutation testing library for LaTeX, Typst, and Markdown",
+  "version": "0.2.0",
+  "description": "Deterministic multi-format document mutation for LaTeX, Typst, and Markdown (engine-gated synthetic faults)",
   "type": "module",
   "license": "MIT",
   "author": "Prajwal S. Venkateshmurthy",
@@ -20,8 +20,10 @@
     "markdown",
     "document-repair",
     "benchmark",
+    "synthetic-faults",
     "tectonic",
-    "render-diff"
+    "render-diff",
+    "engine-gate"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -36,9 +38,11 @@
   },
   "files": [
     "dist",
+    "docs",
     "README.md",
     "LICENSE",
-    "PLANNING.md"
+    "PLANNING.md",
+    "CITATION.cff"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -46,6 +50,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "cli": "tsx src/cli.ts",
+    "adequacy": "tsx scripts/adequacy-report.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepack": "tsc -p tsconfig.json"
   },

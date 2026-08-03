@@ -1,10 +1,10 @@
 /**
- * DocMut core types — AST nodes, mutation sites, operators, and result records.
+ * DocMut core types — surface structural nodes, mutation sites, operators, results.
  *
- * Design principles (see PLANNING.md):
- * 1. AST-based mutations (node-level, not raw text)
+ * Design principles (see PLANNING.md and docs/SCOPE-AND-NONGOALS.md):
+ * 1. Surface structural site selection (not full TeX expansion)
  * 2. Deterministic seeded PRNG
- * 3. Render-diff equivalent detection
+ * 3. Optional render-text equivalent detection
  * 4. Engine gate (golden compiles; hard broken fails / soft broken warns or differs)
  * 5. Tiered operators (structural / semantic / realistic)
  * 6. Plugin architecture (cosmic-ray pattern)

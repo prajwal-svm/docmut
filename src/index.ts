@@ -1,7 +1,8 @@
 /**
  * DocMut — public API.
  *
- * AST-based document mutation testing for LaTeX, Typst, and Markdown.
+ * Deterministic multi-format document mutation for LaTeX, Typst, and Markdown.
+ * Surface structural sites; engine gates; optional render-text equivalence filter.
  */
 
 import { defaultRegistry } from "./core/registry.js";
@@ -72,6 +73,13 @@ export { parseDocument, detectFormat, findSitesForOperator, findAllSites } from 
 
 // Registry
 export { OperatorRegistry, defaultRegistry } from "./core/registry.js";
+
+// Operator manifest (paper provenance)
+export {
+  buildOperatorManifest,
+  type OperatorManifest,
+  type OperatorManifestEntry,
+} from "./core/operator-manifest.js";
 
 // Pipeline
 export {
